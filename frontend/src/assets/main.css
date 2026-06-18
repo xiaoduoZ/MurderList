@@ -1,0 +1,566 @@
+/* ============================================================
+   MurderList — design system
+   "Editorial print" theme: warm paper, ink, crimson. Mobile-first.
+   ============================================================ */
+
+:root {
+  --bg: #faf8f5;
+  --surface: #ffffff;
+  --border: #eae5dd;
+  --border-strong: #d9d2c7;
+  --ink: #17151c;
+  --text: var(--ink);
+  --text-dim: #6c6776;
+  --accent: #e03340;
+  --accent-deep: #c0202c;
+  --accent-soft: rgba(224, 51, 64, 0.08);
+  --ok: #2e9e6b;
+  --ok-deep: #1f7a50;
+  --shadow-sm: 0 1px 2px rgba(23, 21, 28, 0.04), 0 6px 18px rgba(23, 21, 28, 0.05);
+  --shadow-md: 0 2px 4px rgba(23, 21, 28, 0.05), 0 16px 36px rgba(23, 21, 28, 0.1);
+  --radius: 20px;
+  --radius-sm: 12px;
+  --font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  /* spring easing tokens — used app-wide for that hand-finished feel */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-snap: cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* print-proof crop marks in the viewport corners */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 10px;
+  pointer-events: none;
+  z-index: 60;
+  --mark: rgba(23, 21, 28, 0.22);
+  background-image:
+    linear-gradient(var(--mark), var(--mark)), linear-gradient(var(--mark), var(--mark)),
+    linear-gradient(var(--mark), var(--mark)), linear-gradient(var(--mark), var(--mark)),
+    linear-gradient(var(--mark), var(--mark)), linear-gradient(var(--mark), var(--mark)),
+    linear-gradient(var(--mark), var(--mark)), linear-gradient(var(--mark), var(--mark));
+  background-repeat: no-repeat;
+  background-size: 14px 1px, 1px 14px, 14px 1px, 1px 14px, 14px 1px, 1px 14px, 14px 1px, 1px 14px;
+  background-position:
+    left top, left top,
+    right top, right top,
+    left bottom, left bottom,
+    right bottom, right bottom;
+}
+
+/* no z-index here: #app must not create a stacking context, so the fixed
+   overlays inside it (toasts 100 > death-flash 90 > confetti 80) can layer
+   above the body::before crop marks (60) in the root context */
+#app {
+  position: relative;
+  max-width: 27rem;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: calc(18px + env(safe-area-inset-top)) 20px calc(28px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+}
+
+#app > * {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, p {
+  margin: 0;
+}
+
+/* views receive focus programmatically after route transitions */
+main:focus {
+  outline: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+}
+
+/* ---------- typography helpers ---------- */
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.serif {
+  font-family: var(--font-serif);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+}
+
+.field-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* small crimson print-index numeral, e.g. "01" before a label */
+.idx {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-deep);
+  margin-right: 6px;
+}
+
+.hint {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+
+.wordmark {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.wordmark .dot {
+  color: var(--accent);
+}
+
+/* ---------- surfaces ---------- */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* viewfinder corner brackets (top-left + bottom-right) that "lock on" */
+.reticle {
+  position: relative;
+}
+
+.reticle::before,
+.reticle::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+
+.reticle::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid var(--accent);
+  border-left: 2px solid var(--accent);
+  border-top-left-radius: var(--radius);
+}
+
+.reticle::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid var(--accent);
+  border-right: 2px solid var(--accent);
+  border-bottom-right-radius: var(--radius);
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  border: none;
+  margin: 0;
+}
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  color: var(--text-dim);
+  background: var(--surface);
+}
+
+.tag-dead {
+  border-color: rgba(224, 51, 64, 0.45);
+  color: var(--accent-deep);
+}
+
+/* rubber-stamp verdict (DeadPanel, ResultPanel) */
+.stamp {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  border: 2px solid currentColor;
+  border-radius: 5px;
+  padding: 6px 10px 6px calc(10px + 0.26em);
+  transform: rotate(-4deg);
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 54px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 14px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    transform 0.3s var(--ease-spring),
+    box-shadow 0.3s var(--ease-out),
+    opacity 0.15s ease;
+}
+
+/* press sinks into the paper — instant down, springy back up */
+.btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98);
+  transition-duration: 0.06s;
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: #fdfcfa;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:active:not(:disabled) {
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-ghost {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  color: var(--ink);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  padding: 10px;
+  font-size: 13px;
+  color: var(--text-dim);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (hover: hover) {
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+/* ---------- forms ---------- */
+
+.field {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 16px; /* >=16px prevents iOS zoom-on-focus */
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input::placeholder {
+  color: rgba(108, 103, 118, 0.75);
+}
+
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.input-code {
+  font-family: var(--font-mono);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* ---------- page chrome ---------- */
+
+.pagehead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 4px 0 24px;
+}
+
+.pagehead h1 {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  font-size: 17px;
+  line-height: 1;
+  transition: transform 0.3s var(--ease-spring);
+}
+
+.back:active {
+  transform: scale(0.92);
+  transition-duration: 0.06s;
+}
+
+/* ---------- router transitions (directional) ---------- */
+
+.page-fwd-enter-active,
+.page-fwd-leave-active,
+.page-back-enter-active,
+.page-back-leave-active,
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition: opacity 0.2s var(--ease-out), transform 0.2s var(--ease-out);
+}
+
+.page-fwd-enter-from {
+  opacity: 0;
+  transform: translateX(22px);
+}
+
+.page-fwd-leave-to {
+  opacity: 0;
+  transform: translateX(-14px);
+}
+
+.page-back-enter-from {
+  opacity: 0;
+  transform: translateX(-22px);
+}
+
+.page-back-leave-to {
+  opacity: 0;
+  transform: translateX(14px);
+}
+
+.page-fade-enter-from,
+.page-fade-leave-to {
+  opacity: 0;
+}
+
+.panel-enter-active,
+.panel-leave-active {
+  transition: opacity 0.22s var(--ease-out), transform 0.22s var(--ease-out);
+}
+
+.panel-enter-from {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.panel-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+/* ---------- shared motion utilities ---------- */
+
+/* children rise in one after another */
+@media (prefers-reduced-motion: no-preference) {
+  .stagger > * {
+    animation: rise 0.6s var(--ease-out) both;
+  }
+  .stagger > :nth-child(1) { animation-delay: 0.05s; }
+  .stagger > :nth-child(2) { animation-delay: 0.11s; }
+  .stagger > :nth-child(3) { animation-delay: 0.17s; }
+  .stagger > :nth-child(4) { animation-delay: 0.23s; }
+  .stagger > :nth-child(5) { animation-delay: 0.29s; }
+  .stagger > :nth-child(6) { animation-delay: 0.35s; }
+  .stagger > :nth-child(7) { animation-delay: 0.41s; }
+  .stagger > :nth-child(8) { animation-delay: 0.47s; }
+
+  /* corner brackets snap onto the card after it appears */
+  .reticle::before {
+    animation: lock-tl 0.55s var(--ease-snap) 0.18s both;
+  }
+  .reticle::after {
+    animation: lock-br 0.55s var(--ease-snap) 0.18s both;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@keyframes lock-tl {
+  from {
+    opacity: 0;
+    transform: translate(-12px, -12px);
+  }
+}
+
+@keyframes lock-br {
+  from {
+    opacity: 0;
+    transform: translate(12px, 12px);
+  }
+}
+
+/* odometer roll — wrap a keyed <span> in <Transition name="roll"> inside .odo */
+.odo {
+  position: relative;
+  display: inline-flex;
+  overflow: hidden;
+}
+
+.roll-enter-active,
+.roll-leave-active {
+  transition: transform 0.35s var(--ease-out), opacity 0.35s var(--ease-out);
+}
+
+.roll-leave-active {
+  position: absolute;
+  inset: 0;
+}
+
+.roll-enter-from {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+.roll-leave-to {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+/* live player roster: joins flash crimson, reorders glide (FLIP) */
+.roster-move {
+  transition: transform 0.35s var(--ease-out);
+}
+
+.roster-leave-active {
+  position: absolute;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .roster-enter-active {
+    animation: row-join 1.1s var(--ease-out);
+  }
+}
+
+@keyframes row-join {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  30% {
+    opacity: 1;
+    transform: none;
+    background-color: var(--accent-soft);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* ---------- shared keyframes ---------- */
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
